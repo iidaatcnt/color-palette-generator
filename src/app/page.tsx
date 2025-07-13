@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 interface Color {
   hex: string;
@@ -51,7 +51,8 @@ export default function ColorPaletteGenerator() {
   };
 
   // 色名を生成
-  const getColorName = (r: number, g: number, b: number): string => {
+  const getColorName = useCallback((r: number, g: number, b: number): string => {
+    // 色の特徴に基づいて名前を決定
     const brightness = (r * 299 + g * 587 + b * 114) / 1000;
     const isWarm = r > g && r > b;
     const isCool = b > r && b > g;
@@ -69,10 +70,10 @@ export default function ColorPaletteGenerator() {
     }
     
     return namePool[Math.floor(Math.random() * namePool.length)];
-  };
+  }, [colorNames]);
 
   // ランダムな色を生成
-  const generateRandomColor = (): Color => {
+  const generateRandomColor = useCallback((): Color => {
     const r = Math.floor(Math.random() * 256);
     const g = Math.floor(Math.random() * 256);
     const b = Math.floor(Math.random() * 256);
@@ -83,10 +84,10 @@ export default function ColorPaletteGenerator() {
     const name = getColorName(r, g, b);
 
     return { hex, rgb, hsl, name };
-  };
+  }, [getColorName]);
 
   // ハーモニアスなパレット生成
-  const generateHarmoniousPalette = (): Color[] => {
+  const generateHarmoniousPalette = useCallback((): Color[] => {
     const baseColor = generateRandomColor();
     const palette = [baseColor];
     
@@ -95,12 +96,12 @@ export default function ColorPaletteGenerator() {
     
     // 4つの調和した色を生成
     for (let i = 1; i < 5; i++) {
-      const hueShift = (i * 72) % 360; // 色相を72度ずつシフト（よりバランス良く）
-      const variation = Math.random() * 0.4 + 0.6; // 明度の変化を調整
+      const hueShift = (i * 60) % 360; // 色相を60度ずつシフト
+      const variation = Math.random() * 0.3 + 0.7; // 明度の変化
       
-      const r = Math.min(255, Math.max(0, Math.floor(baseRgb[0] * variation + Math.sin(hueShift * Math.PI / 180) * 60)));
-      const g = Math.min(255, Math.max(0, Math.floor(baseRgb[1] * variation + Math.sin((hueShift + 120) * Math.PI / 180) * 60)));
-      const b = Math.min(255, Math.max(0, Math.floor(baseRgb[2] * variation + Math.sin((hueShift + 240) * Math.PI / 180) * 60)));
+      const r = Math.min(255, Math.max(0, Math.floor(baseRgb[0] * variation + Math.sin(hueShift) * 50)));
+      const g = Math.min(255, Math.max(0, Math.floor(baseRgb[1] * variation + Math.sin(hueShift + 120) * 50)));
+      const b = Math.min(255, Math.max(0, Math.floor(baseRgb[2] * variation + Math.sin(hueShift + 240) * 50)));
       
       const hex = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`.toUpperCase();
       const rgb = `rgb(${r}, ${g}, ${b})`;
@@ -111,22 +112,22 @@ export default function ColorPaletteGenerator() {
     }
     
     return palette;
-  };
+  }, [generateRandomColor, getColorName]);
 
-  // パレット生成（useCallbackを除去して安定化）
-  const generatePalette = async () => {
+  // パレット生成
+  const generatePalette = useCallback(async () => {
     setIsGenerating(true);
     
     // アニメーション用の遅延
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise(resolve => setTimeout(resolve, 500));
     
     const newPalette = generateHarmoniousPalette();
     setPalette(newPalette);
     setIsGenerating(false);
-  };
+  }, [generateHarmoniousPalette]);
 
   // クリップボードにコピー
-  const copyToClipboard = async (colorValue: string) => {
+  const copyToClipboard = async (colorValue: string, format: 'hex' | 'rgb' | 'hsl' = 'hex') => {
     try {
       await navigator.clipboard.writeText(colorValue);
       setCopiedColor(colorValue);
@@ -151,30 +152,33 @@ export default function ColorPaletteGenerator() {
     if (palette.length > 0) {
       const newSavedPalettes = [...savedPalettes, palette];
       setSavedPalettes(newSavedPalettes);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('savedPalettes', JSON.stringify(newSavedPalettes));
-      }
+      localStorage.setItem('savedPalettes', JSON.stringify(newSavedPalettes));
     }
   };
 
-  // 保存されたパレットの読み込み（一度だけ実行）
+  // 保存されたパレットの読み込み
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('savedPalettes');
-        if (saved) {
-          setSavedPalettes(JSON.parse(saved));
-        }
-      } catch (err) {
-        console.error('Failed to load saved palettes:', err);
+    try {
+      const saved = localStorage.getItem('savedPalettes');
+      if (saved) {
+        setSavedPalettes(JSON.parse(saved));
       }
+    } catch (err) {
+      console.error('Failed to load saved palettes:', err);
     }
-  }, []); // 空の依存配列で一度だけ実行
+  }, []);
 
-  // 初回ロード時にパレット生成（一度だけ実行）
+  // 初回ロード時にパレット生成
   useEffect(() => {
     generatePalette();
-  }, []); // 空の依存配列で一度だけ実行
+  }, [generatePalette]);
+
+  // 文字色を動的に決定（コントラスト比考慮）
+  const getTextColor = (hexColor: string): string => {
+    const rgb = hexColor.match(/\w\w/g)!.map(hex => parseInt(hex, 16));
+    const brightness = (rgb[0] * 299 + rgb[1] * 587 + rgb[2] * 114) / 1000;
+    return brightness > 128 ? '#000000' : '#FFFFFF';
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
