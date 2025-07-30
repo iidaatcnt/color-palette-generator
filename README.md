@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Color Palette Generator
+
+This is a web application that generates beautiful and harmonious color palettes with a single click.
+
+## Overview
+
+This tool is designed for designers, developers, and anyone who needs to create a color scheme quickly and easily. It uses a harmonious color theory to generate palettes that are aesthetically pleasing and well-balanced.
+
+## Features
+
+-   **One-Click Generation:** Generate a new color palette with a single click.
+-   **Harmonious Colors:** Palettes are generated based on harmonious color theory, ensuring a balanced and visually appealing result.
+-   **Multiple Color Formats:** Get color codes in HEX, RGB, and HSL formats.
+-   **Copy to Clipboard:** Easily copy color codes to your clipboard by clicking on them.
+-   **Save Palettes:** Save your favorite palettes to your browser's local storage for later use.
+-   **Responsive Design:** The application is fully responsive and works on all devices.
+
+## How to Use
+
+1.  Click the "Generate New Palette" button to create a new color palette.
+2.  Click on any color card or color code to copy it to your clipboard.
+3.  Click the "Save Palette" button to save the current palette.
+4.  You can view your saved palettes at the bottom of the page and reload them by clicking the "Use This Palette" button.
+
+## Technologies Used
+
+-   **Framework:** [Next.js](https://nextjs.org/)
+-   **Language:** [TypeScript](https://www.typescriptlang.org/)
+-   **Styling:** [Tailwind CSS](https://tailwindcss.com/)
 
 ## Getting Started
 
-First, run the development server:
+To get a local copy up and running, follow these simple steps.
 
-```bash
+### Prerequisites
+
+-   Node.js (v16.x or later)
+-   npm, yarn, or pnpm
+
+### Installation
+
+1.  Clone the repo
+    ```sh
+    git clone https://github.com/iidaatcnt/color-palette-generator.git
+    ```
+2.  Install NPM packages
+    ```sh
+    npm install
+    ```
+
+### Usage
+
+To start the development server, run the following command:
+
+```sh
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## License
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Distributed under the MIT License. See `LICENSE` for more information.
